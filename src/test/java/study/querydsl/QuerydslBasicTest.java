@@ -13,6 +13,7 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -670,7 +671,7 @@ public class QuerydslBasicTest {
         long count = queryFactory
                 .update(member)
                 .set(member.age, member.age.add(1))
-               // .set(member.age, member.age.multiply(1))
+                // .set(member.age, member.age.multiply(1))
                 .execute();
     }
 
@@ -680,7 +681,36 @@ public class QuerydslBasicTest {
                 .delete(member)
                 .where(member.age.gt(18))
                 .execute();
-
     }
+
+    @Test
+    @DisplayName("방언에 등록된 디비 함수 호출")
+    void sqlFunction() {
+        List<String> result = queryFactory
+                .select(Expressions.stringTemplate(
+                        "function('replace', {0}, {1}, {2})",
+                        member.username, "member", "m"))
+                .from(member)
+                .fetch();
+
+        for (String s : result) {
+            System.out.println("s = " + s);
+        }
+    }
+
+    @Test
+    void sqlFunction2() {
+        List<String> result = queryFactory
+                .select(member.username)
+                .from(member)
+              //  .where(member.username.eq(Expressions.stringTemplate("function('lower', {0})", member.username)))
+                .where(member.username.eq(member.username.lower()))
+                .fetch();
+
+        for (String s : result) {
+            System.out.println("s = " + s);
+        }
+    }
+
 
 }
