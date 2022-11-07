@@ -116,8 +116,9 @@ class MemberRepositoryTest {
         for (Member findMember : result) {
             System.out.println("findMember = " + findMember);
         }
-
     }
+
+
 
 
 }
